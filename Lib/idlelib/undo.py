@@ -48,11 +48,12 @@ class UndoDelegator(Delegator):
         return "break"
 
     def reset_undo(self):
+        """Reset the undo/redo history."""
         self.was_saved = -1
         self.pointer = 0
         self.undolist = []
         self.undoblock = 0  # or a CommandSequence instance
-        self.set_saved(1)
+        self.set_saved(True)
 
     def set_saved(self, flag):
         if flag:
@@ -351,10 +352,17 @@ def _undo_delegator(parent):  # htest #
     d = UndoDelegator()
     p.insertfilter(d)
 
+    def saved_change_hook():
+        is_saved = d.get_saved()
+        undowin.title(("*" if not is_saved else "") + "Test UndoDelegator")
+    d.set_saved_change_hook(saved_change_hook)
+
     undo = Button(undowin, text="Undo", command=lambda:d.undo_event(None))
     undo.pack(side='left')
     redo = Button(undowin, text="Redo", command=lambda:d.redo_event(None))
     redo.pack(side='left')
+    reset = Button(undowin, text="Reset", command=lambda:d.reset_undo())
+    reset.pack(side='left')
     dump = Button(undowin, text="Dump", command=lambda:d.dump_event(None))
     dump.pack(side='left')
 

@@ -1272,11 +1272,13 @@ class PyShell(OutputWindow):
         self.interp.restart_subprocess(with_cwd=True)
 
     def showprompt(self):
+        """Display a new prompt in the shell window."""
         self.resetoutput()
         self.console.write(self.prompt)
         self.text.mark_set("insert", "end-1c")
         self.set_line_and_column()
         self.io.reset_undo()
+        self.undo.set_saved(False)
 
     def show_warning(self, msg):
         width = self.interp.tkconsole.width

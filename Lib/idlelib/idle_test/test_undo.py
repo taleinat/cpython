@@ -6,7 +6,7 @@ import unittest
 from test.support import requires
 requires('gui')
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from tkinter import Text, Tk
 from idlelib.percolator import Percolator
 
@@ -85,6 +85,31 @@ class UndoDelegatorTest(unittest.TestCase):
         self.assertTupleEqual((d.pointer, d.can_merge), (3, True))
         text.event_generate('<<undo>>')
         self.assertTupleEqual((d.pointer, d.can_merge), (2, False))
+
+    def test_reset_undo(self):
+        eq = self.assertEqual
+        neq = self.assertNotEqual
+        d = self.delegator
+        orig_sch = d.saved_change_hook
+
+        def set_text():
+            self.text.insert('insert', 'spam')
+            self.text.insert('insert', '\n')
+            self.text.insert('insert', 'this is the second line')
+
+        set_text()
+        eq(d.pointer, len(d.undolist))
+        neq(d.saved, d.pointer)
+
+        # reset_undo should set saved to True and trigger the save change hook
+        saved_change_hook = Mock()
+        d.set_saved_change_hook(saved_change_hook)
+        d.reset_undo()
+        saved_change_hook.assert_called()
+        eq(d.pointer, 0)
+        eq(d.undolist, [])
+        eq(d.undoblock, 0)
+        eq(d.saved, d.pointer)
 
     def test_get_set_saved(self):
         # test the getter method get_saved

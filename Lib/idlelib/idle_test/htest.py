@@ -349,7 +349,8 @@ _undo_delegator_spec = {
     'kwds': {},
     'msg': "Click [Undo] to undo any action.\n"
            "Click [Redo] to redo any action.\n"
-           "Click [Dump] to dump the current state "
+           "Click [Reset] to reset the undo state.\n"
+           "Click [Dump] to dump the current undo state "
            "by printing to the console or the IDLE shell.\n"
     }
 
